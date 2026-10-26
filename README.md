@@ -56,6 +56,7 @@ Copy the `skills/power-off` folder into your agent's skills directory.
 
 | | Project (shared with your team) | All your projects |
 |---|---|---|
+| Codex | `.agents/skills/power-off/` | `~/.agents/skills/power-off/` |
 | Claude Code | `.claude/skills/power-off/` | `~/.claude/skills/power-off/` |
 | Cursor | `.cursor/skills/power-off/` | `~/.cursor/skills/power-off/` |
 
