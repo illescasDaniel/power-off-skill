@@ -9,20 +9,26 @@ Cursor and any other agent that loads skills.
 ## How it works
 
 1. **Trigger check**: only your own message in the conversation counts as a request.
-2. **Pick the mode** from your words: *normal*, or *force* if you add "even if it fails or needs my attention"
-   (or run `/power-off force`).
+2. **Pick the mode** from your words: *default* (always powers off, even if the task failed or a decision is
+   pending), or *or-sleep* if you add "or sleep if you need me" (or run `/power-off or-sleep`; `or-suspend` works too).
 3. **Finish first**: a failed task is retried once. Then:
 
-   | Situation | Normal | Force |
+   | Situation | Default | or-sleep |
    |---|---|---|
-   | Done, or failed twice | power off | power off |
-   | Needs your decision | **sleep**, so it resumes when you are back | power off |
+   | Task done | power off | power off |
+   | Task failed (retried once, failed again) | power off | power off, or **sleep** if the failure leaves things the user should look at first |
+   | Agent needs a decision from the user | power off | **sleep**, so it resumes when you are back |
+   | Powering off seems unwise (unsaved or half-finished work outside the task, a risky state) | power off | **sleep** |
+   | Remote machine (SSH), other users logged in, or WSL | asks first, no shutdown | asks first, no shutdown |
+   | Power-off command fails | retries once, then **sleep** | retries once, then **sleep** |
+   | Sleep also fails | machine stays on, nothing more to try | machine stays on, nothing more to try |
 
    The report is written to a file first, since the session dies at shutdown.
 4. **Safety check**: it asks first on remote machines (SSH), when other users are logged in, and on WSL (where the
    command powers off the Windows host), in both modes.
 5. **Shutdown**: `scripts/power-off.sh [--sleep]` (or `power-off.ps1 [-Sleep]`) detects the OS, waits 5 seconds (so
-   the agent can finish its reply) and runs the graceful command. No OS force flags.
+   the agent can finish its reply) and runs the graceful command, retrying once and then falling
+   back to sleep if that fails. No OS force flags.
 
 | OS | Power off | Sleep |
 |---|---|---|
